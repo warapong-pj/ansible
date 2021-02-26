@@ -1,4 +1,4 @@
-- name: Install Docker container runtime
+- name: Install CRI-O container runtime
   hosts: crio-worker
   become: yes
   become_method: sudo
@@ -21,17 +21,17 @@
         - software-properties-common
       state: present
       update_cache: yes
-  - apt_repository:
-      repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/ /
-      state: present
-  - apt_repository:
-      repo: deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.17/xUbuntu_18.04/ /
-      state: present
   - apt_key:
       url: "https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:1.17/xUbuntu_18.04/Release.key"
       state: present
   - apt_key:
       url: "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/Release.key"
+      state: present
+  - apt_repository:
+      repo: "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_18.04/ /"
+      state: present
+  - apt_repository:
+      repo: "deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/1.17/xUbuntu_18.04/ /"
       state: present
   - apt:
       pkg:
@@ -44,3 +44,4 @@
       name: crio
       state: started
       enabled: True
+      daemon_reload: yes

@@ -1,17 +1,20 @@
-- name: Install Docker container runtime
+- name: Install Kubernetes cluster
   hosts: kubernetes-worker
   become: yes
   become_method: sudo
   tasks:
   - blockinfile:
       path: /etc/sysctl.d/99-kubernetes-cri.conf
+      create: yes
       block: |
         net.bridge.bridge-nf-call-iptables = 1
         net.bridge.bridge-nf-call-ip6tables = 1
         net.ipv4.ip_forward = 1
   - blockinfile:
       path: /etc/modules
+      create: yes
       block: |
+        overlay
         br_netfilter
   - apt:
       pkg:
@@ -19,11 +22,11 @@
         - curl
       state: present
       update_cache: yes
-  - apt_repository:
-      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-      state: present
   - apt_key:
       url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+      state: present
+  - apt_repository:
+      repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
       state: present
   - apt:
       pkg:
@@ -32,3 +35,8 @@
         - kubectl
       state: present
       update_cache: yes
+  - systemd:
+      name: kubelet
+      state: started
+      enabled: True
+      daemon_reload: yes
