@@ -1,5 +1,5 @@
 - name: Install Docker container runtime
-  hosts: crio-worker
+  hosts: kubernetes-worker
   become: yes
   become_method: sudo
   tasks:

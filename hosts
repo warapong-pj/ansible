@@ -1,0 +1,8 @@
+[docker-worker]
+xx.xx.xx.xx    ansible_user=ubuntu
+
+[crio-worker]
+xx.xx.xx.xx    ansible_user=ubuntu
+
+[kubernetes-worker]
+xx.xx.xx.xx    ansible_user=ubuntu
