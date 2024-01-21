@@ -1,5 +1,5 @@
 [cri-o]
-xx.xx.xx.xx    ansible_user=ubuntu
+localhost    ansible_user=vagrant
 
 [kubernetes]
-xx.xx.xx.xx    ansible_user=ubuntu
+localhost    ansible_user=vagrant
