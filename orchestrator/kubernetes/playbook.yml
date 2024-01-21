@@ -49,3 +49,4 @@
       block: |
         overlay
         br_netfilter
+  - ansible.builtin.shell: sudo sed -i '/\tswap\t/d' /etc/fstab
