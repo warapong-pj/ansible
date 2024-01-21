@@ -1,0 +1,40 @@
+- name: Install CRI-O container runtime
+  hosts: cri-o
+  become: yes
+  become_method: sudo
+  vars:
+  - OS: xUbuntu_22.04
+  - VERSION: "1.27"
+  tasks: 
+  - ansible.builtin.apt:
+      pkg:
+        - docker
+        - docker-engine
+        - docker.io
+        - containerd
+        - runc
+      state: absent
+      update_cache: yes
+  - ansible.builtin.apt_key:
+      url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/Release.key
+      state: present
+  - ansible.builtin.apt_repository:
+      repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ OS }}/ /
+      state: present
+  - ansible.builtin.apt_key:
+      url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ VERSION }}/{{ OS }}/Release.key
+      state: present
+  - ansible.builtin.apt_repository:
+      repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ VERSION }}/{{ OS }}/ /
+      state: present
+  - ansible.builtin.apt:
+      pkg:
+        - cri-o 
+        - cri-o-runc
+      state: present
+      update_cache: yes
+  - ansible.builtin.systemd_service:
+      name: crio
+      state: started
+      enabled: True
+      daemon_reload: yes

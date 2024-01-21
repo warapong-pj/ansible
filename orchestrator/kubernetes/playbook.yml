@@ -1,8 +1,41 @@
-- name: Install Kubernetes cluster
-  hosts: kubernetes-worker
+- name: Install CRI-O container runtime
+  hosts: kubernetes
   become: yes
   become_method: sudo
-  tasks:
+  vars:
+  - VERSION: v1.27
+  tasks: 
+  - ansible.builtin.apt:
+      pkg:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gpg
+      state: present
+      update_cache: yes
+#  - ansible.builtin.shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/{{ VERSION }}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+  - ansible.builtin.apt_key:
+      url: https://pkgs.k8s.io/core:/stable:/{{ VERSION }}/deb/Release.key
+      state: present
+  - ansible.builtin.apt_repository:
+      repo: deb https://pkgs.k8s.io/core:/stable:/{{ VERSION }}/deb/ /
+      state: present
+  - ansible.builtin.apt:
+      pkg:
+        - kubelet
+        - kubeadm
+        - kubectl
+      state: present
+      update_cache: yes
+  - ansible.builtin.dpkg_selections:
+      name: kubelet
+      selection: hold
+  - ansible.builtin.dpkg_selections:
+      name: kubeadm
+      selection: hold
+  - ansible.builtin.dpkg_selections:
+      name: kubectl
+      selection: hold
   - blockinfile:
       path: /etc/sysctl.d/99-kubernetes-cri.conf
       create: yes
@@ -16,27 +49,3 @@
       block: |
         overlay
         br_netfilter
-  - apt:
-      pkg:
-        - apt-transport-https 
-        - curl
-      state: present
-      update_cache: yes
-  - apt_key:
-      url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
-      state: present
-  - apt_repository:
-      repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
-      state: present
-  - apt:
-      pkg:
-        - kubelet
-        - kubeadm
-        - kubectl
-      state: present
-      update_cache: yes
-  - systemd:
-      name: kubelet
-      state: started
-      enabled: True
-      daemon_reload: yes
